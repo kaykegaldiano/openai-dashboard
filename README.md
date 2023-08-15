@@ -1,66 +1,57 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Installing the project
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This project utilizes Docker Containers, through the Laravel Sail package in order to facilitate the development environment configuration. Therefore, you must already have Docker and Docker Compose installed on your machine.
 
-## About Laravel
+You are free to run this project in local environment, but this text will not deal with this situation.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Steps to run the project locally:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Clone the project to your local machine
+- Create a `.env` file, I recommend using `.env-example` as a base
+- Add or change the keys as per your need
+- Access the project folder via console (terminal/PowerShell/CMD)
+- Run the command:
+```shell
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php82-composer:latest \
+    composer install --ignore-platform-reqs
+ ```
+- After processing is complete, run the command `./vendor/bin/sail up -d`
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The first command performs the packages installation via composer specified in `composer.json` file and once the installation ends, the *vendor* folder becomes available in the project. The next command raise the containers based on service description made in the `docker-compose.yml` file.
 
-## Learning Laravel
+By default, no configuration is needed in the *.env* project file. In case any editing is needed in the default configuration (related to binding ports or database credentials), just edit the *.env* file.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+# Working with Containers
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Once the project is running on top of Docker containers, it is clear the situation that the local machine does not have any of the necessary requirements to work on the project, so commands like `php artisan`, `composer` or `npm` will not work locally. To run commands in one of the project containers, a `php artisan route:liste` for example, you need to use Docker for this, for example:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+docker-compose exec \ # executing a command in an existing container
+    -u sail \ # specifies the username to be used within the container
+    laravel_project.test \ # specifies which container will receive the command
+    php artisan route:list # what command to run
+```
 
-## Laravel Sponsors
+ The execution, therefore, becomes very verbose and laborious, which can lead to potential execution errors. Thus, *Laravel Sail* provides a script called `sail` that is located at *vendor/bin/*. This script allows such commands to be executed through aliases so that the development flow is more natural and less complex. So, to run the same `php artisan route:list` command with the `sail` script would look like this:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+ ```bash
+ ./vendor/bin/sail artisan route:list
 
-### Premium Partners
+ # or
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+ ./vendor/bin/sail art route:list
+ ```
 
-## Contributing
+### Available commands
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+To see the commands available through the sail script, run ./vendor/bin/sail -h for a complete listing of options with description.
 
-## Code of Conduct
+# Next steps
+Migrations are a way to version your database tables. To structure your database
+- Run `./vendor/bin/sail art migrate` to assemble and add the tables to your database
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Run `./vendor/bin/sail art db:seed` to populate your database with dummy data
