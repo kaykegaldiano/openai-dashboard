@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
 {
@@ -22,25 +26,29 @@ class ClientController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View
     {
-        //
+        return view('clients.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreClientRequest $request)
+    public function store(StoreClientRequest $request): RedirectResponse
     {
-        //
-    }
+        DB::transaction(function () use ($request) {
+            $user = User::create([
+                'name' => $request->get('name'),
+                'email' => $request->get('email'),
+                'password' => Hash::make('123456')
+            ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Client $client)
-    {
-        //
+            $user->client()->create([
+                'address_id' => $request->get('address_id')
+            ]);
+        });
+
+        return redirect()->route('clients.index')->with('status', 'Client created with success!');
     }
 
     /**
@@ -48,15 +56,26 @@ class ClientController extends Controller
      */
     public function edit(Client $client)
     {
-        //
+        return view('clients.edit', compact('client'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateClientRequest $request, Client $client)
+    public function update(UpdateClientRequest $request, Client $client): RedirectResponse
     {
-        //
+        DB::transaction(function () use ($request, $client) {
+            $client->user()->update([
+                'name' => $request->get('name'),
+                'email' => $request->get('email'),
+            ]);
+
+            $client->update([
+                'address_id' => $request->get('address_id')
+            ]);
+        });
+
+        return redirect()->route('clients.index')->with('status', 'Client updated with success!');
     }
 
     /**
