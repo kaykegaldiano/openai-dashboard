@@ -13,6 +13,8 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        @stack('customer-scripts')
     </head>
     <body class="min-h-screen">
         <div x-data="{ menuVisibility: false }">
@@ -29,5 +31,6 @@
             </div>
             
         </div>
+        @livewireScriptConfig 
     </body>
 </html>
