@@ -12,7 +12,7 @@
       <div class="px-4 sm:px-6 lg:px-8">
         
         <x-heading
-          title="Client"
+          title="Clients"
           description="A list of all the clients."
           :btn-label="__('Create client')"
           :route="route('clients.create')" />
@@ -24,7 +24,7 @@
               ['label' => 'Client', 'column' => 'user.name'],
               ['label' => 'Email', 'column' => 'user.email'],
               ['label' => 'City', 'column' => 'address.city'],
-              ['label' => 'Status', 'column' => 'address.state'],
+              ['label' => 'State', 'column' => 'address.state'],
             ]"
             edit="clients.edit"
             delete="clients.delete"/>
